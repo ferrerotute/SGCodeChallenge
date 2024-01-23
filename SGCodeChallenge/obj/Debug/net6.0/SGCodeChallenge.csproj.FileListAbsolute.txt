@@ -39,3 +39,10 @@ C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\run
 C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.Mvc.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.Razor.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.Helpers.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.WebPages.Deployment.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.WebPages.Razor.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\System.Web.WebPages.dll
+C:\Users\matia\source\repos\SGCodeChallenge\SGCodeChallenge\bin\Debug\net6.0\Microsoft.Web.Infrastructure.dll

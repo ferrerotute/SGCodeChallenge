@@ -38,8 +38,6 @@ namespace SGCodeChallenge.Controllers
                 indexViewModel = JsonConvert.DeserializeObject<IndexViewModel>(Encoding.UTF8.GetString(storedData));
             }
 
-
-
             return View(indexViewModel);
         }
 
@@ -47,22 +45,111 @@ namespace SGCodeChallenge.Controllers
         public IActionResult GetSelectedAccount([FromBody] IndexViewModel indexViewModel)
         {
             AccountManager accountManager = new AccountManager();
-            Account? account = accountManager.Get(indexViewModel.SelectedCurrency);
-            indexViewModel.SelectedAccount = account;
+            try
+            {
+                Account? account = accountManager.Get(indexViewModel.SelectedCurrency);
+                indexViewModel.SelectedAccount = account;
+            }
+            catch (Exception ex)
+            {
+                indexViewModel.Message = ex.Message;
+            }
             HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
-
-            return View("Index", indexViewModel);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+              return View("Index", indexViewModel);
+            }
+            else { return Json(indexViewModel); }
         }
-        
+
         [HttpPost]
         public IActionResult OpenAccount([FromBody] IndexViewModel indexViewModel)
         {
             AccountManager accountManager = new AccountManager();
-            Account account = accountManager.Create(indexViewModel.SelectedCurrency);
-            indexViewModel.SelectedAccount = account;
+            try
+            {
+                Account account = accountManager.Create(indexViewModel.SelectedCurrency);
+                indexViewModel.SelectedAccount = account;
+            }
+            catch (Exception ex)
+            {
+                indexViewModel.Message = ex.Message;
+            }
             HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
 
-            return View("Index", indexViewModel);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return View("Index", indexViewModel);
+            }
+            else { return Json(indexViewModel); }
+        }
+
+        [HttpPost]
+        public IActionResult CloseAccount([FromBody] IndexViewModel indexViewModel)
+        {
+            AccountManager accountManager = new AccountManager();
+            try
+            {
+                Account? account = accountManager.Close(indexViewModel.SelectedCurrency);
+                indexViewModel.SelectedAccount = account;
+            }
+            catch (Exception ex)
+            {
+                indexViewModel.Message = ex.Message;
+            }
+            HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return View("Index", indexViewModel);
+            }
+            else { return Json(indexViewModel); }
+        }
+
+        [HttpPost]
+        public IActionResult Deposit([FromBody] IndexViewModel indexViewModel)
+        {
+            AccountManager accountManager = new AccountManager();
+            try
+            {
+                Account account = accountManager.Deposit(indexViewModel.SelectedCurrency, indexViewModel.Amount);
+                indexViewModel.SelectedAccount = account;
+            }
+            catch (Exception ex)
+            {
+                indexViewModel.Message = ex.Message;
+            }
+            HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return View("Index", indexViewModel);
+            }
+            else { return Json(indexViewModel); }
+        }
+
+        [HttpPost]
+        public IActionResult Withdraw([FromBody] IndexViewModel indexViewModel)
+        {
+            AccountManager accountManager = new AccountManager();
+            try
+            {
+
+                Account account = accountManager.Withdraw(indexViewModel.SelectedCurrency, indexViewModel.Amount);
+                indexViewModel.SelectedAccount = account;
+            }
+            catch (Exception ex)
+            {
+                indexViewModel.Message = ex.Message;
+                indexViewModel.SelectedAccount = accountManager.Get(indexViewModel.SelectedCurrency);
+            }
+            HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return View("Index", indexViewModel);
+            }
+            else { return Json(indexViewModel); }
         }
         public IActionResult Privacy()
         {

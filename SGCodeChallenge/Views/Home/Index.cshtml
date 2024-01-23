@@ -2,29 +2,63 @@
 @{
     ViewData["Title"] = "SGCodeChallenge";
 }
+<div class="card text-center">
+    <div class="card-body">
+        <div class="container text-center">
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="alert alert-warning" role="alert">
+                    @Model.Message
+                </div>
+            }
+            <h1 class="card-title">SGCodeChallenge</h1>
+            <label for="currencyDropdown">Seleccionar Moneda:</label>
+            <select id="currencyDropdown" class="form-control" name="SelectedCurrency">
+                <option value="0">Seleccionar</option>
+                @foreach (var currency in Model.Currencies)
+                {
+                    <option value="@currency.Id">@currency.Abbreviation, @currency.Name</option>
+                }
+            </select>
+            @if (Model.SelectedAccount != null)
+            {
+                <h2>@Model.SelectedAccount.Currency.Symbol @Model.SelectedAccount.Balance</h2>
+                <button type="button" class="btn btn-primary" id="btnDepositShow">Depositar</button>
+                <button type="button" class="btn btn-secondary" id="btnWithdrawShow">Extraer</button>
+                <button type="button" class="btn btn-danger" id="btnCloseAccount">Cerrar Cuenta</button>
+                <div class="container">
+                    <div class="row g-3" id="rowDeposit">
+                        <div class="col-md-4">
+                            <label for="txtDeposit">Ingrese el monto a depositar:</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" id="txtDeposit">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-success" id="btnDeposit">Depositar</button>
+                        </div>
+                    </div>
+                    <div class="row g-3" id="rowWithdraw">
+                        <div class="col-md-4">
+                            <label for="txtWithDraw">Ingrese el monto a extraer:</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" max="@Model.SelectedAccount.Balance" id="txtWithdraw">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-success" id="btnWithdraw">Extraer</button>
+                        </div>
 
-<div class="text-center">
-    <h1 class="display-4">SGCodeChallenge</h1>
-    <label for="currencyDropdown">Seleccionar Moneda:</label>
-    <select id="currencyDropdown" class="form-control" name="SelectedCurrency">
-        <option value="0">Seleccionar</option>
-        @foreach (var currency in Model.Currencies)
-        {
-            <option value="@currency.Id">@currency.Abbreviation, @currency.Name</option>
-        }
-    </select>    
-    @if(Model.SelectedAccount != null)
-    {
-        <h2>@Model.SelectedAccount.Currency.Symbol @Model.SelectedAccount.Balance</h2>
-        <button class="btn-primary" id="btnDeposit">Depositar</button>
-        <button class="btn-secondary" id="btnWithdraw">Rescatar</button>
-        <button class="btn-danger" id="btnCloseAccount">Cerrar Cuenta</button>
-    }else if(Model.SelectedCurrency != 0)
-    {
-        <h2>No tenes una cuenta con ese fondo</h2>
-        <button class="btn-primary" id="btnOpenAccount">Abrir Cuenta</button>
-    }
-    <p> </p>
+                    </div>
+                </div>
+            }
+            else if (Model.SelectedCurrency != 0)
+            {
+                <h2>No tenes una cuenta con ese fondo</h2>
+                <button type="button" class="btn btn-primary" id="btnOpenAccount">Abrir Cuenta</button>
+            }
+        </div>
+    </div>
 </div>
 
 @section scripts {
@@ -32,35 +66,32 @@
         $(document).ready(function () {
             var selectedCurrency = @Model.SelectedCurrency;
             $('#currencyDropdown').val(selectedCurrency);
+            $('#rowDeposit, #rowWithdraw').hide();
 
             $('#currencyDropdown').change(function () {
                 var SelectedCurrency = $(this).val();
-                if (SelectedCurrency !== '0') {
-                    var indexViewModel = @Html.Raw(Json.Serialize(Model));
-                    var indexViewModel = {
-                        SelectedAccount: null,
-                        Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
-                        SelectedCurrency: parseInt(SelectedCurrency)
-                    }; 
+                var indexViewModel = @Html.Raw(Json.Serialize(Model));
+                var indexViewModel = {
+                    SelectedAccount: null,
+                    Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                    SelectedCurrency: parseInt(SelectedCurrency)
+                };
 
-                    console.log(JSON.stringify(indexViewModel));
+                console.log(JSON.stringify(indexViewModel));
 
-                    $.ajax({
-                        type: 'POST',
-                        url: '/Home/GetSelectedAccount',
-                        dataType: 'html', 
-                        contentType: 'application/json',
-                        data: JSON.stringify(indexViewModel),
-                        success: function (data) {
-                            window.location.href = '/Home/Index';
-                        },
-                        error: function () {
-                            console.log('Error retrieving SelectedAccount.');
-                        }
-                    });
-                } else {
-                    $('h2').text('');
-                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/GetSelectedAccount',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(indexViewModel),
+                    success: function (data) {
+                        window.location.href = '/Home/Index';
+                    },
+                    error: function () {
+                        console.log('Error retrieving SelectedAccount.');
+                    }
+                });
             });
 
             $('#btnOpenAccount').click(function () {
@@ -68,7 +99,7 @@
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
                     SelectedCurrency: @Model.SelectedCurrency
-                };
+                                                        };
 
                 console.log(JSON.stringify(indexViewModel));
 
@@ -86,6 +117,91 @@
                     }
                 });
             });
+
+            $('#btnCloseAccount').click(function () {
+                var indexViewModel = {
+                    SelectedAccount: null,
+                    Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                    SelectedCurrency: @Model.SelectedCurrency
+                                                        };
+
+                console.log(JSON.stringify(indexViewModel));
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/CloseAccount',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(indexViewModel),
+                    success: function (data) {
+                        window.location.href = '/Home/Index';
+                    },
+                    error: function () {
+                        console.log('Error closing account.');
+                    }
+                });
+            });
+
+            $('#btnDepositShow').click(function () {
+                $('#rowDeposit').show();
+                $('#rowWithdraw').hide();
+
+            });
+            
+            $('#btnWithdrawShow').click(function () {
+                $('#rowWithdraw').show();
+                $('#rowDeposit').hide();
+            });
+
+            $('#btnDeposit').click(function () {
+                var indexViewModel = {
+                    SelectedAccount: null,
+                    Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                    SelectedCurrency: @Model.SelectedCurrency,
+                    Amount : $('#txtDeposit').val()
+                };
+                console.log(JSON.stringify(indexViewModel));
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/Deposit',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(indexViewModel),
+                    success: function (data) {
+                        window.location.href = '/Home/Index';
+                    },
+                    error: function () {
+                        console.log('Error opening account.');
+                    }
+                });
+            });
+
+            $('#btnWithdraw').click(function () {
+                var indexViewModel = {
+                    SelectedAccount: null,
+                    Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                    SelectedCurrency: @Model.SelectedCurrency,
+                    Amount: $('#txtWithdraw').val()
+                };
+
+                console.log(JSON.stringify(indexViewModel));
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/Withdraw',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(indexViewModel),
+                    success: function (data) {
+                        window.location.href = '/Home/Index';
+                    },
+                    error: function () {
+                        console.log('Error opening account.');
+                    }
+                });
+            });
+
         });
     </script>
 }
