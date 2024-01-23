@@ -28,7 +28,7 @@ namespace Core
                 if (dataConnection.Reader.Read())
                 {
                     currency.Name = (string)dataConnection.Reader["name"];
-                    currency.Symbol = (string)dataConnection.Reader["symbol"];
+                    currency.Symbol = formatSymbol((string)dataConnection.Reader["symbol"]);
                     currency.Abbreviation = (string)dataConnection.Reader["abbreviation"];
                 }
                 return currency;
@@ -53,7 +53,7 @@ namespace Core
                     Currency currency = new Currency();
                     currency.Id = (int)dataConnection.Reader["Id"];
                     currency.Name = (string)dataConnection.Reader["name"];
-                    currency.Symbol = (string)dataConnection.Reader["symbol"];
+                    currency.Symbol = formatSymbol((string)dataConnection.Reader["symbol"]);
                     currency.Abbreviation = (string)dataConnection.Reader["abbreviation"];
                     currenciesList.Add(currency);
                 }
@@ -64,6 +64,19 @@ namespace Core
                 throw;
             }
             finally{ dataConnection.closeConnection(); }
+        }
+
+        private string formatSymbol(string symbol)
+        {
+            if (symbol.StartsWith("\\u"))
+            {
+                string unicodeValue = symbol.Substring(2);
+                if (int.TryParse(unicodeValue, System.Globalization.NumberStyles.HexNumber, null, out int intValue))
+                {
+                    symbol = char.ConvertFromUtf32(intValue);
+                }
+            }
+            return symbol;
         }
 
 

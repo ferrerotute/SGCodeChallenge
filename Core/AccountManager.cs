@@ -5,11 +5,17 @@ namespace Core
 {
     public class AccountManager
     {
-        public Account Get(int currencyID)
+        public Account? Get(int currencyID)
+        {
+
+            Account? account = new Account();
+            return account.Get(currencyID); 
+        } 
+        public Account Create(int currencyID)
         {
 
             Account account = new Account();
-            return account.Get(currencyID); 
+            return account.Create(currencyID); 
         }
 
         public Currency Update(Currency currency)

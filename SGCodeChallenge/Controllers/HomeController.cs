@@ -29,14 +29,6 @@ namespace SGCodeChallenge.Controllers
                 List<Currency> currencyList = currencyManager.GetList();
                 foreach (Currency currency in currencyList)
                 {
-                    if (currency.Symbol.StartsWith("\\u"))
-                    {
-                        string unicodeValue = currency.Symbol.Substring(2); // Elimina el prefijo "\u"
-                        if (int.TryParse(unicodeValue, System.Globalization.NumberStyles.HexNumber, null, out int intValue))
-                        {
-                            currency.Symbol = char.ConvertFromUtf32(intValue);
-                        }
-                    }
                     indexViewModel.Currencies.Add(currency);
                 }
                 indexViewModel.SelectedCurrency = 0;
@@ -55,7 +47,18 @@ namespace SGCodeChallenge.Controllers
         public IActionResult GetSelectedAccount([FromBody] IndexViewModel indexViewModel)
         {
             AccountManager accountManager = new AccountManager();
-            Account account = accountManager.Get(indexViewModel.SelectedCurrency);
+            Account? account = accountManager.Get(indexViewModel.SelectedCurrency);
+            indexViewModel.SelectedAccount = account;
+            HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
+
+            return View("Index", indexViewModel);
+        }
+        
+        [HttpPost]
+        public IActionResult OpenAccount([FromBody] IndexViewModel indexViewModel)
+        {
+            AccountManager accountManager = new AccountManager();
+            Account account = accountManager.Create(indexViewModel.SelectedCurrency);
             indexViewModel.SelectedAccount = account;
             HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
 

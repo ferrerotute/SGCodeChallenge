@@ -16,8 +16,13 @@
     @if(Model.SelectedAccount != null)
     {
         <h2>@Model.SelectedAccount.Currency.Symbol @Model.SelectedAccount.Balance</h2>
-        <button class="btn-primary">Depositar</button>
-        <button class="btn-secondary">Rescatar</button>
+        <button class="btn-primary" id="btnDeposit">Depositar</button>
+        <button class="btn-secondary" id="btnWithdraw">Rescatar</button>
+        <button class="btn-danger" id="btnCloseAccount">Cerrar Cuenta</button>
+    }else if(Model.SelectedCurrency != 0)
+    {
+        <h2>No tenes una cuenta con ese fondo</h2>
+        <button class="btn-primary" id="btnOpenAccount">Abrir Cuenta</button>
     }
     <p> </p>
 </div>
@@ -25,25 +30,25 @@
 @section scripts {
     <script>
         $(document).ready(function () {
-            var selectedCurrency = @Model.SelectedCurrency; // Obtener el valor desde el modelo
+            var selectedCurrency = @Model.SelectedCurrency;
             $('#currencyDropdown').val(selectedCurrency);
 
             $('#currencyDropdown').change(function () {
                 var SelectedCurrency = $(this).val();
                 if (SelectedCurrency !== '0') {
-                    // Crear el objeto IndexViewModel con la información del formulario
                     var indexViewModel = @Html.Raw(Json.Serialize(Model));
                     var indexViewModel = {
                         SelectedAccount: null,
                         Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
                         SelectedCurrency: parseInt(SelectedCurrency)
-                    }; console.log(JSON.stringify(indexViewModel));
+                    }; 
 
-                    // Hacer una llamada AJAX de tipo POST a la acción del controlador
+                    console.log(JSON.stringify(indexViewModel));
+
                     $.ajax({
                         type: 'POST',
                         url: '/Home/GetSelectedAccount',
-                        dataType: 'html', // Add this line
+                        dataType: 'html', 
                         contentType: 'application/json',
                         data: JSON.stringify(indexViewModel),
                         success: function (data) {
@@ -54,9 +59,32 @@
                         }
                     });
                 } else {
-                    // Manejar el caso cuando 'Seleccionar' está seleccionado
                     $('h2').text('');
                 }
+            });
+
+            $('#btnOpenAccount').click(function () {
+                var indexViewModel = {
+                    SelectedAccount: null,
+                    Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                    SelectedCurrency: @Model.SelectedCurrency
+                };
+
+                console.log(JSON.stringify(indexViewModel));
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/OpenAccount',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(indexViewModel),
+                    success: function (data) {
+                        window.location.href = '/Home/Index';
+                    },
+                    error: function () {
+                        console.log('Error opening account.');
+                    }
+                });
             });
         });
     </script>
