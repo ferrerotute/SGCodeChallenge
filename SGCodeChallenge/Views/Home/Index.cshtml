@@ -1,0 +1,63 @@
+﻿@model IndexViewModel
+@{
+    ViewData["Title"] = "SGCodeChallenge";
+}
+
+<div class="text-center">
+    <h1 class="display-4">SGCodeChallenge</h1>
+    <label for="currencyDropdown">Seleccionar Moneda:</label>
+    <select id="currencyDropdown" class="form-control" name="SelectedCurrency">
+        <option value="0">Seleccionar</option>
+        @foreach (var currency in Model.Currencies)
+        {
+            <option value="@currency.Id">@currency.Abbreviation, @currency.Name</option>
+        }
+    </select>    
+    @if(Model.SelectedAccount != null)
+    {
+        <h2>@Model.SelectedAccount.Currency.Symbol @Model.SelectedAccount.Balance</h2>
+        <button class="btn-primary">Depositar</button>
+        <button class="btn-secondary">Rescatar</button>
+    }
+    <p> </p>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var selectedCurrency = @Model.SelectedCurrency; // Obtener el valor desde el modelo
+            $('#currencyDropdown').val(selectedCurrency);
+
+            $('#currencyDropdown').change(function () {
+                var SelectedCurrency = $(this).val();
+                if (SelectedCurrency !== '0') {
+                    // Crear el objeto IndexViewModel con la información del formulario
+                    var indexViewModel = @Html.Raw(Json.Serialize(Model));
+                    var indexViewModel = {
+                        SelectedAccount: null,
+                        Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
+                        SelectedCurrency: parseInt(SelectedCurrency)
+                    }; console.log(JSON.stringify(indexViewModel));
+
+                    // Hacer una llamada AJAX de tipo POST a la acción del controlador
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Home/GetSelectedAccount',
+                        dataType: 'html', // Add this line
+                        contentType: 'application/json',
+                        data: JSON.stringify(indexViewModel),
+                        success: function (data) {
+                            window.location.href = '/Home/Index';
+                        },
+                        error: function () {
+                            console.log('Error retrieving SelectedAccount.');
+                        }
+                    });
+                } else {
+                    // Manejar el caso cuando 'Seleccionar' está seleccionado
+                    $('h2').text('');
+                }
+            });
+        });
+    </script>
+}
