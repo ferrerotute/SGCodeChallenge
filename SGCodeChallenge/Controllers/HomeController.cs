@@ -76,6 +76,7 @@ namespace SGCodeChallenge.Controllers
             {
                 Account? account = accountManager.Get(indexViewModel.SelectedCurrency);
                 indexViewModel.SelectedAccount = account;
+                indexViewModel.Message = account == null ? "No existe cuenta con este fondo" : "";
             }
             catch (Exception ex)
             {
@@ -87,6 +88,23 @@ namespace SGCodeChallenge.Controllers
                 return View("Index", indexViewModel);
             }
             else { return Json(indexViewModel); }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult GetCurrencies()
+        {
+            CurrencyManager currencyManager = new CurrencyManager();
+            List<Currency> currencies;
+            try
+            {
+                currencies = currencyManager.GetList();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return Json(currencies); 
         }
 
         [Authorize]
