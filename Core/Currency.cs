@@ -79,8 +79,6 @@ namespace Core
             return symbol;
         }
 
-
-
         #endregion
     }
 }

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using SGCodeChallenge.Models;
 using System.Diagnostics;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SGCodeChallenge.Controllers
 {
@@ -17,7 +18,7 @@ namespace SGCodeChallenge.Controllers
 
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             CurrencyManager currencyManager = new CurrencyManager();
             IndexViewModel indexViewModel = new IndexViewModel();
@@ -37,12 +38,36 @@ namespace SGCodeChallenge.Controllers
             {
                 indexViewModel = JsonConvert.DeserializeObject<IndexViewModel>(Encoding.UTF8.GetString(storedData));
             }
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://localhost:7114");
 
-            return View(indexViewModel);
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", "SGCodeChallengeUser"),
+                    new KeyValuePair<string, string>("password", "SGCodeChallengePassword"),
+                });
+
+                HttpResponseMessage response = await client.PostAsync("/tokens/connect", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+
+                    TokenResponse token = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
+
+                    indexViewModel.Token = token.access_token;
+                }
+
+            }
+            return View("Index", indexViewModel);
+
         }
 
+        [Authorize]
         [HttpPost]
-        public IActionResult GetSelectedAccount([FromBody] IndexViewModel indexViewModel)
+        public IActionResult GetSelectedAccount([FromBody]IndexViewModel indexViewModel)
         {
             AccountManager accountManager = new AccountManager();
             try
@@ -57,11 +82,12 @@ namespace SGCodeChallenge.Controllers
             HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-              return View("Index", indexViewModel);
+                return View("Index", indexViewModel);
             }
             else { return Json(indexViewModel); }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult OpenAccount([FromBody] IndexViewModel indexViewModel)
         {
@@ -84,6 +110,7 @@ namespace SGCodeChallenge.Controllers
             else { return Json(indexViewModel); }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult CloseAccount([FromBody] IndexViewModel indexViewModel)
         {
@@ -106,6 +133,7 @@ namespace SGCodeChallenge.Controllers
             else { return Json(indexViewModel); }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Deposit([FromBody] IndexViewModel indexViewModel)
         {
@@ -118,6 +146,8 @@ namespace SGCodeChallenge.Controllers
             catch (Exception ex)
             {
                 indexViewModel.Message = ex.Message;
+                indexViewModel.SelectedAccount = accountManager.Get(indexViewModel.SelectedCurrency);
+
             }
             HttpContext.Session.Set("IndexViewModel", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(indexViewModel)));
 
@@ -128,6 +158,7 @@ namespace SGCodeChallenge.Controllers
             else { return Json(indexViewModel); }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Withdraw([FromBody] IndexViewModel indexViewModel)
         {

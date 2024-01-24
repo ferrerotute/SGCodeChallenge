@@ -9,5 +9,6 @@ namespace SGCodeChallenge.Models
         public int SelectedCurrency { get; set; }
         public decimal Amount { get; set; }
         public string Message { get; set; }
+        public string Token { get; set; }
     }
 }

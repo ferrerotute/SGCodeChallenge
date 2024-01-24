@@ -43,7 +43,7 @@
                             <label for="txtWithDraw">Ingrese el monto a extraer:</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="number" class="form-control" max="@Model.SelectedAccount.Balance" id="txtWithdraw">
+                            <input type="number" class="form-control" id="txtWithdraw">
                         </div>
                         <div class="col-md-4">
                             <button type="button" class="btn btn-success" id="btnWithdraw">Extraer</button>
@@ -74,22 +74,31 @@
                 var indexViewModel = {
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
-                    SelectedCurrency: parseInt(SelectedCurrency)
+                    SelectedCurrency: parseInt(SelectedCurrency),
+                    Message: "",
+                    Token: '@Model.Token'
                 };
 
                 console.log(JSON.stringify(indexViewModel));
-
+                var Token = '@Model.Token';
+               
                 $.ajax({
                     type: 'POST',
                     url: '/Home/GetSelectedAccount',
                     dataType: 'html',
                     contentType: 'application/json',
                     data: JSON.stringify(indexViewModel),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + Token);
+                    },
                     success: function (data) {
                         window.location.href = '/Home/Index';
                     },
-                    error: function () {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         console.log('Error retrieving SelectedAccount.');
+                        console.log('jqXHR:', jqXHR);
+                        console.log('textStatus:', textStatus);
+                        console.log('errorThrown:', errorThrown);
                     }
                 });
             });
@@ -98,10 +107,15 @@
                 var indexViewModel = {
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
-                    SelectedCurrency: @Model.SelectedCurrency
+                    SelectedCurrency: @Model.SelectedCurrency,
+                    Message: "",
+                    Token: '@Model.Token'
+
                                                         };
 
                 console.log(JSON.stringify(indexViewModel));
+                var Token = '@Model.Token';
+
 
                 $.ajax({
                     type: 'POST',
@@ -109,6 +123,9 @@
                     dataType: 'html',
                     contentType: 'application/json',
                     data: JSON.stringify(indexViewModel),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + Token);
+                    },
                     success: function (data) {
                         window.location.href = '/Home/Index';
                     },
@@ -122,10 +139,14 @@
                 var indexViewModel = {
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
-                    SelectedCurrency: @Model.SelectedCurrency
+                    SelectedCurrency: @Model.SelectedCurrency,
+                    Message: "",
+                    Token: '@Model.Token'
                                                         };
 
                 console.log(JSON.stringify(indexViewModel));
+                var Token = '@Model.Token';
+
 
                 $.ajax({
                     type: 'POST',
@@ -133,6 +154,9 @@
                     dataType: 'html',
                     contentType: 'application/json',
                     data: JSON.stringify(indexViewModel),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + Token);
+                    },
                     success: function (data) {
                         window.location.href = '/Home/Index';
                     },
@@ -158,9 +182,13 @@
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
                     SelectedCurrency: @Model.SelectedCurrency,
-                    Amount : $('#txtDeposit').val()
+                    Amount : $('#txtDeposit').val(),
+                    Message: "",
+                    Token: '@Model.Token'
+
                 };
                 console.log(JSON.stringify(indexViewModel));
+                var Token = '@Model.Token';
 
                 $.ajax({
                     type: 'POST',
@@ -168,6 +196,9 @@
                     dataType: 'html',
                     contentType: 'application/json',
                     data: JSON.stringify(indexViewModel),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + Token);
+                    },
                     success: function (data) {
                         window.location.href = '/Home/Index';
                     },
@@ -182,10 +213,14 @@
                     SelectedAccount: null,
                     Currencies: @Html.Raw(Json.Serialize(Model.Currencies)),
                     SelectedCurrency: @Model.SelectedCurrency,
-                    Amount: $('#txtWithdraw').val()
+                    Amount: $('#txtWithdraw').val(),
+                    Message: "",
+                    Token: '@Model.Token'
+
                 };
 
                 console.log(JSON.stringify(indexViewModel));
+                var Token = '@Model.Token';
 
                 $.ajax({
                     type: 'POST',
@@ -193,6 +228,9 @@
                     dataType: 'html',
                     contentType: 'application/json',
                     data: JSON.stringify(indexViewModel),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + Token);
+                    },
                     success: function (data) {
                         window.location.href = '/Home/Index';
                     },
