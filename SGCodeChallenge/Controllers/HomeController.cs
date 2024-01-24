@@ -38,9 +38,11 @@ namespace SGCodeChallenge.Controllers
             {
                 indexViewModel = JsonConvert.DeserializeObject<IndexViewModel>(Encoding.UTF8.GetString(storedData));
             }
+            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://localhost:7114");
+                client.BaseAddress = new Uri(baseUrl);
 
                 var content = new FormUrlEncodedContent(new[]
                 {
